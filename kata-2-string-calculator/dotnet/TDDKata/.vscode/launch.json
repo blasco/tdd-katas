@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/TDDKata.Tests/bin/Debug/net6.0/TDDKata.Tests.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/TDDKata.Tests",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "logging": {
+                "moduleLoad": false
+            }
+        }
+    ]
+}
