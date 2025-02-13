@@ -31,6 +31,7 @@ namespace TDDKata.Tests
         }
 
         [TestCase("//;\n1;2", 3)]
+        [TestCase("//\n\n1\n2", 3)]
         public void GivenAStringInputWithCustomSeparator_ThenItReturnsTheSum(string input, int expected)
         {
             var success = SimpleCalculator.Add(input, out var result);
