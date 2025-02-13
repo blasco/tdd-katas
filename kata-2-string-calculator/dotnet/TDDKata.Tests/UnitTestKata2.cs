@@ -30,15 +30,15 @@ namespace TDDKata.Tests
             Assert.That(success, Is.False);
         }
 
-        // [TestCase("//;\n1;2", 3)]
-        // public void GivenAStringInputWithCustomSeparator_ThenItReturnsTheSum(string input, int expected)
-        // {
-        //     var success = SimpleCalculator.Add(input, out var result);
-        //     Assert.Multiple(() =>
-        //     {
-        //         Assert.That(success, Is.True);
-        //         Assert.That(result, Is.EqualTo(expected));
-        //     });
-        // }
+        [TestCase("//;\n1;2", 3)]
+        public void GivenAStringInputWithCustomSeparator_ThenItReturnsTheSum(string input, int expected)
+        {
+            var success = SimpleCalculator.Add(input, out var result);
+            Assert.Multiple(() =>
+            {
+                Assert.That(success, Is.True);
+                Assert.That(result, Is.EqualTo(expected));
+            });
+        }
     }
 }

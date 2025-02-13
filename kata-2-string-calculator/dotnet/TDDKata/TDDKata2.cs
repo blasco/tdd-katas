@@ -2,6 +2,8 @@
 
 public class SimpleCalculator
 {
+    private static readonly char[] _DefaultSeparators = [',', '\n'];
+
     public static bool Add(string input, out int result)
     {
         if (!IsInputStringValid(input))
@@ -10,9 +12,9 @@ public class SimpleCalculator
             return false;
         }
 
-        var separators = GetSeparators(input);
+        ParseCustomSeparator(input, out string calculationInput, out char[] separators);
 
-        bool success = GetNumbers(input, separators, out var numbers);
+        bool success = GetNumbers(calculationInput, separators, out var numbers);
 
         if (!success)
         {
@@ -24,31 +26,20 @@ public class SimpleCalculator
         return true;
     }
 
-    private static char[] GetSeparators(string input)
+    private static void ParseCustomSeparator(string input, out string calculationInput, out char[] separators)
     {
-        if (ParseCustomSeparator(input, out var separator))
+        bool hasCustomSeparator =
+            input.Length > 4 && input[0] == '/' && input[1] == '/' && input[3] == '\n';
+
+        if (!hasCustomSeparator)
         {
-            return [separator];
+            separators = _DefaultSeparators;
+            calculationInput = input;
+            return;
         }
-        else
-        {
-            return _DefaultSeparators;
-        }
+        separators = [input[2]];
+        calculationInput = input[4..];
     }
-
-    private static bool ParseCustomSeparator(string input, out char separator)
-    {
-        if (input.Length < 4 || input[0] != '/' || input[1] != '/')
-        {
-            separator = default;
-            return false;
-        }
-
-        separator = input[2];
-        return true;
-    }
-
-    private static readonly char[] _DefaultSeparators = [',', '\n'];
 
     private static bool IsInputStringValid(string input)
     {
