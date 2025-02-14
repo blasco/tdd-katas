@@ -1,29 +1,36 @@
 ﻿namespace TDDKata;
 
-public class SimpleCalculator
+
+public class SimpleCalculatorInput
 {
+    public bool IsValid;
+    public IEnumerable<int> Numbers;
+
     private static readonly char[] _DefaultSeparators = [',', '\n'];
 
-    public static bool Add(string input, out int result)
+    private SimpleCalculatorInput(bool isValid, IEnumerable<int> numbers)
+    {
+        Numbers = numbers;
+    }
+
+    public static SimpleCalculatorInput Create(string input)
     {
         if (!IsInputStringValid(input))
         {
-            result = 0;
-            return false;
+            return new SimpleCalculatorInput(isValid: false, numbers: []);
         }
 
         ParseCustomSeparator(input, out string calculationInput, out char[] separators);
 
         bool success = GetNumbers(calculationInput, separators, out var numbers);
+        return new SimpleCalculatorInput(isValid: success, numbers: numbers);
+    }
 
-        if (!success)
-        {
-            result = 0;
-            return false;
-        }
-
-        result = numbers.Sum();
-        return true;
+    private static bool IsInputStringValid(string input)
+    {
+        if (input.Length == 0) return true;
+        var lastChar = input.Last();
+        return !_DefaultSeparators.Contains(lastChar);
     }
 
     private static void ParseCustomSeparator(string input, out string calculationInput, out char[] separators)
@@ -41,13 +48,6 @@ public class SimpleCalculator
         calculationInput = input[4..];
     }
 
-    private static bool IsInputStringValid(string input)
-    {
-        if (input.Length == 0) return true;
-        var lastChar = input.Last();
-        return !_DefaultSeparators.Contains(lastChar);
-    }
-
     private static bool GetNumbers(string input, char[] separators, out IEnumerable<int> numbers)
     {
         var maybeParsedNumbers = input
@@ -56,7 +56,6 @@ public class SimpleCalculator
             .Where(static n => !string.IsNullOrWhiteSpace(n))
             .Select(static number => int.TryParse(number.Trim(), out var result) ? (int?)result : null);
 
-        // Return false if any of the numbers could not be parsed
         if (maybeParsedNumbers.Any(static n => n == null))
         {
             numbers = [];
@@ -66,4 +65,24 @@ public class SimpleCalculator
         numbers = maybeParsedNumbers.Select(n => n.GetValueOrDefault());
         return true;
     }
+}
+
+public class SimpleCalculator
+{
+    public static bool Add(string input, out int result)
+    {
+
+        var calculatorInput = SimpleCalculatorInput.Create(input);
+
+        if (!calculatorInput.IsValid)
+        {
+            result = 0;
+            return false;
+        }
+
+        result = calculatorInput.Numbers.Sum();
+
+        return true;
+    }
+
 }
