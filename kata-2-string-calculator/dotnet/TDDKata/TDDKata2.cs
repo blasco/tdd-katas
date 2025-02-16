@@ -1,36 +1,51 @@
 ﻿namespace TDDKata;
 
-
-public class SimpleCalculatorInput
+public class SimpleCalculatorInput(IEnumerable<int> numbers)
 {
-    public bool IsValid;
-    public IEnumerable<int> Numbers;
+    public bool IsValid { get; private set; } = true;
+    public IEnumerable<int> Numbers { get; private set; } = numbers;
 
     private static readonly char[] _DefaultSeparators = [',', '\n'];
 
-    private SimpleCalculatorInput(bool isValid, IEnumerable<int> numbers)
-    {
-        Numbers = numbers;
-    }
-
     public static SimpleCalculatorInput Create(string input)
     {
-        if (!IsInputStringValid(input))
+        if (input.Length == 0)
         {
-            return new SimpleCalculatorInput(isValid: false, numbers: []);
+            var emptyResult = new SimpleCalculatorInput(numbers: [])
+            {
+                IsValid = true
+            };
+            return emptyResult;
         }
 
         ParseCustomSeparator(input, out string calculationInput, out char[] separators);
 
+        if (!IsInputStringValid(input, separators))
+        {
+            var invalidResult = new SimpleCalculatorInput(numbers: [])
+            {
+                IsValid = false
+            };
+            return invalidResult;
+        }
+
         bool success = GetNumbers(calculationInput, separators, out var numbers);
-        return new SimpleCalculatorInput(isValid: success, numbers: numbers);
+        var result = new SimpleCalculatorInput(numbers)
+        {
+            IsValid = success
+        };
+        return result;
     }
 
-    private static bool IsInputStringValid(string input)
+    public static implicit operator SimpleCalculatorInput(string input)
     {
-        if (input.Length == 0) return true;
+        return Create(input);
+    }
+
+    private static bool IsInputStringValid(string input, char[] separators)
+    {
         var lastChar = input.Last();
-        return !_DefaultSeparators.Contains(lastChar);
+        return !separators.Contains(lastChar);
     }
 
     private static void ParseCustomSeparator(string input, out string calculationInput, out char[] separators)
@@ -44,7 +59,7 @@ public class SimpleCalculatorInput
             calculationInput = input;
             return;
         }
-        separators = [input[2]];
+        separators = [.._DefaultSeparators, input[2]];
         calculationInput = input[4..];
     }
 
@@ -69,20 +84,16 @@ public class SimpleCalculatorInput
 
 public class SimpleCalculator
 {
-    public static bool Add(string input, out int result)
+    public static bool Add(SimpleCalculatorInput input, out int result)
     {
-
-        var calculatorInput = SimpleCalculatorInput.Create(input);
-
-        if (!calculatorInput.IsValid)
+        if (!input.IsValid)
         {
             result = 0;
             return false;
         }
 
-        result = calculatorInput.Numbers.Sum();
+        result = input.Numbers.Sum();
 
         return true;
     }
-
 }
